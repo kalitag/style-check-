@@ -432,12 +432,12 @@ class TitleCleaner:
         all_skip_words = skip_words.union(gender_words)
         
         for word in words:
-            if ( 
-    len(word) > 2 
-    and word not in all_skip_words
-    and not re.match(r'^\d+$', word)
-):
-    pass  # <-- ye ensure karega ki block valid hai
+    if (
+        len(word) > 2
+        and word not in all_skip_words
+        and not re.match(r'^\d+$', word)
+    ):
+        pass  # <-- ye ensure karega ki block valid hai
 
 @staticmethod
 def is_nonsense_title(title: str) -> bool:
