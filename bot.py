@@ -427,11 +427,11 @@ class TitleCleaner:
             'http', 'https', 'www', 'com', 'html', 'php', 'share'
         }
         
-        # Skip gender and quantity words too
-        gender_words = {kw for kw_list in TitleCleaner.GENDER_KEYWORDS.values() for kw in kw_list}
-        all_skip_words = skip_words.union(gender_words)
-        
-       for word in words:
+             # Skip gender and quantity words too
+     gender_words = {kw for kw_list in TitleCleaner.GENDER_KEYWORDS.values() for kw in kw_list}
+     all_skip_words = skip_words.union(gender_words)
+
+     for word in words:
     if (
         len(word) > 2
         and word not in all_skip_words
