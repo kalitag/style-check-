@@ -360,32 +360,33 @@ class TitleCleaner:
             match = re.search(pattern, text, re.IGNORECASE)
             if match:
                 quantity = match.group(1) if match.groups() else match.group(0)
-                
-                [# Format based on pattern type
-                if 'pack of' in pattern:
-                    return f"Pack of {quantity}"
-                elif 'set of' in pattern:
-                    return f"Set of {quantity}"
-                elif 'pcs' in pattern or 'pieces' in pattern:
-                    return f"{quantity} Pcs"
-                elif 'kg' in pattern:
-                    return f"{quantity}kg"
-                elif 'g' in pattern and 'kg' not in pattern:
-                    return f"{quantity}g"
-                elif 'ml' in pattern:
-                    return f"{quantity}ml"
-                elif 'l' in pattern and 'ml' not in pattern:
-                    return f"{quantity}L"
-                elif 'combo' in pattern:
-                    return f"Combo of {quantity}"
-                elif 'pairs' in pattern:
-                    return f"{quantity} Pairs"
-                elif 'multipack' in pattern:
-                    return f"Multipack {quantity}"
-                else:
-                    return f"{quantity} Pcs"
+            
+        """Format quantity based on pattern type"""
+        # Format based on pattern type
+        if 'pack of' in pattern:
+            return f"Pack of {quantity}"
+        elif 'set of' in pattern:
+            return f"Set of {quantity}"
+        elif 'pcs' in pattern or 'pieces' in pattern:
+            return f"{quantity} Pcs"
+        elif 'kg' in pattern:
+            return f"{quantity}kg"
+        elif 'g' in pattern and 'kg' not in pattern:
+            return f"{quantity}g"
+        elif 'ml' in pattern:
+            return f"{quantity}ml"
+        elif 'l' in pattern and 'ml' not in pattern:
+            return f"{quantity}L"
+        elif 'combo' in pattern:
+            return f"Combo of {quantity}"
+        elif 'pairs' in pattern:
+            return f"{quantity} Pairs"
+        elif 'multipack' in pattern:
+            return f"Multipack {quantity}"
+        else:
+            return f"{quantity} Pcs"
 
-        return None
+    return None
 
     @staticmethod
     def extract_brand(words: List[str]) -> Optional[str]:
