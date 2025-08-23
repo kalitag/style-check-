@@ -438,9 +438,9 @@ class TitleCleaner:
         and not re.match(r'^\d+$', word)
     ):
         pass  # <-- ye ensure karega ki block valid hai
-
-@staticmethod
-def is_nonsense_title(title: str) -> bool:
+    
+    @staticmethod
+    def is_nonsense_title(title: str) -> bool:
         """Check if title is nonsense/invalid"""
         if len(title) < 3:
             return True
