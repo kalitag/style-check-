@@ -420,30 +420,27 @@ class TitleCleaner:
                 return word.title()
         
         # If not clothing, extract meaningful product words
-            product_words = []
-    skip_words = {
-        'for', 'with', 'and', 'or', 'the', 'a', 'an', 'in', 'on', 'at',
-        'buy', 'get', 'best', 'new', 'old', 'good', 'great', 'super',
-        'http', 'https', 'www', 'com', 'html', 'php', 'share'
-    }
-
-    # Skip gender and quantity words too
-    gender_words = {kw for kw_list in TitleCleaner.GENDER_KEYWORDS.values() for kw in kw_list}
-    all_skip_words = skip_words.union(gender_words)
-
-    for word in words:
-        if (
-            len(word) > 2
-            and word not in all_skip_words
-            and not re.match(r'^\d+$', word)  # skip pure numbers
-        ):
-            product_words.append(word)
-
-@staticmethod
-def is_nonsense_title(title: str) -> bool:
-    """Check if title is nonsense/invalid"""
-    if len(title) < 3:
-        return True
+        product_words = []
+        skip_words = {
+            'for', 'with', 'and', 'or', 'the', 'a', 'an', 'in', 'on', 'at',
+            'buy', 'get', 'best', 'new', 'old', 'good', 'great', 'super',
+            'http', 'https', 'www', 'com', 'html', 'php', 'share'
+        }
+        
+        # Skip gender and quantity words too
+        gender_words = {kw for kw_list in TitleCleaner.GENDER_KEYWORDS.values() for kw in kw_list}
+        all_skip_words = skip_words.union(gender_words)
+        
+        for word in words:
+            if (len(word) > 2 
+                and word not in all_skip_words
+                and not re.match(r'^\d+
+    
+    @staticmethod
+    def is_nonsense_title(title: str) -> bool:
+        """Check if title is nonsense/invalid"""
+        if len(title) < 3:
+            return True
         
         # Check for lack of vowels
         vowel_count = len([c for c in title.lower() if c in 'aeiou'])
