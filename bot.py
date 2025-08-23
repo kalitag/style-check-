@@ -435,15 +435,15 @@ class TitleCleaner:
     if (
         len(word) > 2
         and word not in all_skip_words
-        and not re.match(r'^\d+$', word)
+        and not re.match(r'^\d+$', word)  # fixed regex
     ):
-        pass  # <-- ye ensure karega ki block valid hai
-    
-    @staticmethod
-    def is_nonsense_title(title: str) -> bool:
-        """Check if title is nonsense/invalid"""
-        if len(title) < 3:
-            return True
+        pass  # <-- this block is valid now
+
+@staticmethod
+def is_nonsense_title(title: str) -> bool:
+    """Check if title is nonsense/invalid"""
+    if len(title) < 3:
+        return True
         
         # Check for lack of vowels
         vowel_count = len([c for c in title.lower() if c in 'aeiou'])
