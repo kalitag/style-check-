@@ -434,7 +434,7 @@ class TitleCleaner:
         for word in words:
             if (len(word) > 2 
                 and word not in all_skip_words
-                and not re.match(r'^\d+
+                and not re.match(r'^\d+$', w)
     
     @staticmethod
     def is_nonsense_title(title: str) -> bool:
