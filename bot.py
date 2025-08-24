@@ -886,7 +886,12 @@ def main():
     
     # Create and run bot
     bot = ReviewCheckkBot(TOKEN)
-    bot.run()
+        print("Starting ReviewCheckk Style Bot...")
+        bot.run()
+    except Exception as e:
+        print(f"Error starting bot: {e}")
+        import traceback
+        traceback.print_exc()
 
 if __name__ == "__main__":
     main()
