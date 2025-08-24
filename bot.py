@@ -361,102 +361,137 @@ class TitleCleaner:
             if match:
                 quantity = match.group(1) if match.groups() else match.group(0)
                 
-                # Format based on pattern type
-                if 'pack of' in pattern:
-                    return f"Pack of {quantity}"
-                elif 'set of' in pattern:
-                    return f"Set of {quantity}"
-                elif 'pcs' in pattern or 'pieces' in pattern:
-                    return f"{quantity} Pcs"
-                elif 'kg' in pattern:
-                    return f"{quantity}kg"
-                elif 'g' in pattern and 'kg' not in pattern:
-                    return f"{quantity}g"
-                elif 'ml' in pattern:
-                    return f"{quantity}ml"
-                elif 'l' in pattern and 'ml' not in pattern:
-                    return f"{quantity}L"
-                elif 'combo' in pattern:
-                    return f"Combo of {quantity}"
-                elif 'pairs' in pattern:
-                    return f"{quantity} Pairs"
-                elif 'multipack' in pattern:
-                    return f"Multipack {quantity}"
-                else:
-                    return f"{quantity} Pcs"
-        
-        return None
+               # Format based on pattern type
+    if 'pack of' in pattern:
+        return f"Pack of {quantity}"
+    elif 'set of' in pattern:
+        return f"Set of {quantity}"
+    elif 'pcs' in pattern or 'pieces' in pattern:
+        return f"{quantity} Pcs"
+    elif 'kg' in pattern:
+        return f"{quantity}kg"
+    elif 'g' in pattern and 'kg' not in pattern:
+        return f"{quantity}g"
+    elif 'ml' in pattern:
+        return f"{quantity}ml"
+    elif 'l' in pattern and 'ml' not in pattern:
+        return f"{quantity}L"
+    elif 'combo' in pattern:
+        return f"Combo of {quantity}"
+    elif 'pairs' in pattern:
+        return f"{quantity} Pairs"
+    elif 'multipack' in pattern:
+        return f"Multipack {quantity}"
+    else:
+        return f"{quantity} Pcs"
+
+    return None
+
+@staticmethod
+def extract_brand(words: List[str]) -> Optional[str]:
+    """Extract brand name (usually first meaningful word)"""
+    # Common brands to prioritize
+    known_brands = [
+        'nike', 'adidas', 'puma', 'reebok', 'boat', 'jbl', 'sony', 
+        'samsung', 'apple', 'mi', 'realme', 'oneplus', 'vivo', 'oppo',
+        'libas', 'aurelia', 'w', 'biba', 'global desi', 'chemistry',
+        'asian', 'sparx', 'red tape', 'woodland', 'bata', 'liberty'
+    ]
     
-    @staticmethod
-    def extract_brand(words: List[str]) -> Optional[str]:
-        """Extract brand name (usually first meaningful word)"""
-        # Common brands to prioritize
-        known_brands = [
-            'nike', 'adidas', 'puma', 'reebok', 'boat', 'jbl', 'sony', 
-            'samsung', 'apple', 'mi', 'realme', 'oneplus', 'vivo', 'oppo',
-            'libas', 'aurelia', 'w', 'biba', 'global desi', 'chemistry'
-        ]
-        
-        # Look for known brands first
-        for word in words:
-            if word in known_brands:
-                return word.title()
-        
-        # If no known brand, take first meaningful word (not gender/quantity)
-        for word in words:
-            if (word not in [kw for kw_list in TitleCleaner.GENDER_KEYWORDS.values() for kw in kw_list] 
-                and not re.match(r'\d+', word) 
-                and len(word) > 2):
-                return word.title()
-        
-        return None
+    # Look for known brands first
+    for word in words:
+        if word.lower() in known_brands:
+            return word.title()
     
-    @staticmethod
-    def extract_product(words: List[str]) -> str:
-        """Extract product name (clothing items or main product)"""
-        # Find clothing keywords first
-        for word in words:
-            if word in TitleCleaner.CLOTHING_KEYWORDS:
-                return word.title()
-        
-        # If not clothing, extract meaningful product words
-        product_words = []
-        skip_words = {
-            'for', 'with', 'and', 'or', 'the', 'a', 'an', 'in', 'on', 'at',
-            'buy', 'get', 'best', 'new', 'old', 'good', 'great', 'super',
-            'http', 'https', 'www', 'com', 'html', 'php', 'share'
-        }
-        
-        # Skip gender and quantity words too
-        gender_words = {kw for kw_list in TitleCleaner.GENDER_KEYWORDS.values() for kw in kw_list}
-        all_skip_words = skip_words.union(gender_words)
-        
-        for word in words:
-            if (len(word) > 2 
-                and word not in all_skip_words
-                and not re.match(r'^\d+
+    # Look for multi-word brands
+    text = ' '.join(words).lower()
+    for brand in known_brands:
+        if ' ' in brand and brand in text:
+            return brand.title()
     
-    @staticmethod
-    def is_nonsense_title(title: str) -> bool:
-        """Check if title is nonsense/invalid"""
-        if len(title) < 3:
-            return True
-        
-        # Check for lack of vowels
-        vowel_count = len([c for c in title.lower() if c in 'aeiou'])
-        if vowel_count < len(title) * 0.1:  # Less than 10% vowels
-            return True
-        
-        # Check for repeated characters
-        if re.search(r'(.)\1{4,}', title):  # Same char repeated 5+ times
-            return True
-        
-        return False
+    # If no known brand, take first meaningful word (not gender/quantity)
+    for word in words:
+        if (word.lower() not in [kw for kw_list in TitleCleaner.GENDER_KEYWORDS.values() for kw in kw_list] 
+            and not re.match(r'\d+', word) 
+            and len(word) > 2
+            and word.lower() not in ['for', 'with', 'and', 'the']):
+            return word.title()
     
-    @staticmethod
-    def is_clothing_item(title: str) -> bool:
-        """Check if product is clothing item"""
-        return any(keyword in title.lower() for keyword in TitleCleaner.CLOTHING_KEYWORDS)
+    return None
+
+@staticmethod
+def extract_product(words: List[str]) -> str:
+    """Extract product name (clothing items or main product)"""
+    # Find clothing keywords first
+    for word in words:
+        if word.lower() in TitleCleaner.CLOTHING_KEYWORDS:
+            return word.title()
+    
+    # If not clothing, extract meaningful product words
+    product_words = []
+    skip_words = {
+        'for', 'with', 'and', 'or', 'the', 'a', 'an', 'in', 'on', 'at',
+        'buy', 'get', 'best', 'new', 'old', 'good', 'great', 'super',
+        'http', 'https', 'www', 'com', 'html', 'php', 'share', 'pack',
+        'set', 'combo', 'multipack', 'piece', 'pieces', 'pcs'
+    }
+    
+    # Skip gender and quantity words too
+    gender_words = {kw for kw_list in TitleCleaner.GENDER_KEYWORDS.values() for kw in kw_list}
+    all_skip_words = skip_words.union(gender_words)
+    
+    for word in words:
+        if (len(word) > 2 
+            and word.lower() not in all_skip_words
+            and not re.match(r'^\d+', word)
+            and not re.match(r'^[^\w\s]+$', word)):  # Skip special characters only
+            product_words.append(word.title())
+    
+    if product_words:
+        return ' '.join(product_words[:3])  # Take first 3 meaningful words
+    
+    return "Product"
+
+@staticmethod
+def is_nonsense_title(title: str) -> bool:
+    """Check if title is nonsense/invalid"""
+    if len(title) < 3:
+        return True
+    
+    # Check for lack of vowels
+    vowel_count = len([c for c in title.lower() if c in 'aeiou'])
+    if vowel_count < len(title) * 0.1:  # Less than 10% vowels
+        return True
+    
+    # Check for repeated characters
+    if re.search(r'(.)\1{4,}', title):  # Same char repeated 5+ times
+        return True
+    
+    # Check for mostly special characters
+    special_char_count = len([c for c in title if not c.isalnum() and c != ' '])
+    if special_char_count > len(title) * 0.5:
+        return True
+    
+    return False
+
+@staticmethod
+def is_clothing_item(title: str) -> bool:
+    """Check if product is clothing item"""
+    return any(keyword in title.lower() for keyword in TitleCleaner.CLOTHING_KEYWORDS)
+
+@staticmethod
+def clean_special_characters(text: str) -> str:
+    """Clean special characters while preserving meaningful ones"""
+    # Replace multiple spaces with single space
+    text = re.sub(r'\s+', ' ', text)
+    
+    # Remove excessive punctuation
+    text = re.sub(r'[!@#$%^&*()_+=\[\]{}|;:,.<>?`~]{2,}', ' ', text)
+    
+    # Remove URLs
+    text = re.sub(r'https?://\S+', '', text)
+    
+    return text.strip()
 
 class PriceExtractor:
     """Extract and format prices"""
@@ -471,13 +506,15 @@ class PriceExtractor:
             r'price\s*:?\s*(?:₹|Rs?\.?\s*)(\d[\d,]*)',  # price: ₹1299
             r'cost\s*:?\s*(?:₹|Rs?\.?\s*)(\d[\d,]*)',   # cost: ₹1299
             r'@\s*(\d[\d,]*)\s*rs',  # @1299 rs
+            r'mrp\s*:?\s*(?:₹|Rs?\.?\s*)(\d[\d,]*)',  # MRP: ₹1299
+            r'selling\s*price\s*:?\s*(?:₹|Rs?\.?\s*)(\d[\d,]*)',  # selling price: ₹1299
         ]
         
         for pattern in price_patterns:
             matches = re.findall(pattern, text, re.IGNORECASE)
             if matches:
                 price = matches[0].replace(',', '')
-                if price.isdigit() and int(price) > 0:
+                if price.isdigit() and int(price) > 0 and int(price) < 1000000:  # Reasonable price range
                     return price
         
         return None
@@ -488,6 +525,25 @@ class PriceExtractor:
         if not price:
             return "@rs"
         return f"@{price} rs"
+    
+    @staticmethod
+    def extract_discount(text: str) -> Optional[str]:
+        """Extract discount percentage from text"""
+        discount_patterns = [
+            r'(\d+)%\s*off',
+            r'(\d+)%\s*discount',
+            r'save\s*(\d+)%',
+            r'upto\s*(\d+)%\s*off'
+        ]
+        
+        for pattern in discount_patterns:
+            matches = re.findall(pattern, text, re.IGNORECASE)
+            if matches:
+                discount = matches[0]
+                if discount.isdigit() and 0 < int(discount) <= 90:
+                    return f"{discount}% OFF"
+        
+        return None
 
 class PinDetector:
     """Detect PIN codes from messages"""
@@ -500,13 +556,52 @@ class PinDetector:
         
         for pin in matches:
             # Validate PIN (should not be all same digits or sequential)
-            if len(set(pin)) > 1 and not re.match(r'123456|654321', pin):
+            if len(set(pin)) > 1 and not re.match(r'123456|654321|000000|111111', pin):
                 return pin
         
         return "110001"  # Default PIN for Delhi
+    
+    @staticmethod
+    def is_valid_pin(pin: str) -> bool:
+        """Validate if PIN code is valid"""
+        if not pin or len(pin) != 6 or not pin.isdigit():
+            return False
+        
+        # Check for invalid patterns
+        invalid_patterns = [
+            '000000', '111111', '222222', '333333', '444444',
+            '555555', '666666', '777777', '888888', '999999',
+            '123456', '654321', '012345', '543210'
+        ]
+        
+        return pin not in invalid_patterns
 
 class ResponseBuilder:
     """Build formatted responses"""
+    
+    @staticmethod
+    def build_product_response(title: str, price: str = None, pin: str = None) -> str:
+        """Build formatted product response"""
+        if not title:
+            return "Please provide a valid product title"
+        
+        formatted_title = TitleCleaner.clean_title(title)
+        formatted_price = PriceExtractor.format_price(price) if price else "@rs"
+        formatted_pin = pin if pin and PinDetector.is_valid_pin(pin) else "110001"
+        
+        return f"{formatted_title} {formatted_price} pin:{formatted_pin}"
+    
+    @staticmethod
+    def build_error_response(error_type: str = "general") -> str:
+        """Build error response"""
+        error_messages = {
+            "invalid_title": "Please provide a valid product title",
+            "invalid_price": "Please provide a valid price",
+            "invalid_pin": "Please provide a valid 6-digit PIN code",
+            "general": "Something went wrong. Please try again with a valid product title"
+        }
+        
+        return error_messages.get(error_type, error_messages["general"])
     
     @staticmethod
     def build_response(title: str, url: str, price: str, is_meesho: bool = False, 
