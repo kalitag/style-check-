@@ -456,14 +456,13 @@ class TitleCleaner:
         
         return "Product"
     
-    @staticmethod
+   @staticmethod
     def extract_title_from_url_slug(url: str) -> Optional[str]:
         """Extract title from URL slug patterns"""
         try:
             # Common URL patterns for product titles
             slug_patterns = [
-                r'/([^/]+)/?
-                    ,  # Last part of URL
+                r'/([^/]+)/?$',  # FIXED LINE 465 - Last part of URL
                 r'/share/([^/]+)',  # Share links
                 r'/product/([^/]+)',  # Product pages
                 r'/p/([^/]+)',  # Short product URLs
@@ -485,7 +484,7 @@ class TitleCleaner:
             return None
         except Exception:
             return None
-    
+
     @staticmethod
     def is_nonsense_title(title: str) -> bool:
         """Check if title is nonsense/invalid"""
@@ -506,9 +505,8 @@ class TitleCleaner:
         if re.search(r'(.)\1{4,}', title):  # Same char repeated 5+ times
             return True
         
-        # Check for URL-like patterns
-        if re.match(r'^[a-z0-9]{6,}
-                    , title.lower()):  # Like nm7xhr
+        # Check for URL-like patterns - FIXED
+        if re.match(r'^[a-z0-9]{6,}$', title.lower()):  # Like nm7xhr
             return True
         
         # Check for mostly special characters
@@ -517,12 +515,7 @@ class TitleCleaner:
             return True
         
         return False
-    
-    @staticmethod
-    def is_clothing_item(title: str) -> bool:
-        """Check if product is clothing item"""
-        return any(keyword in title.lower() for keyword in TitleCleaner.CLOTHING_KEYWORDS)
-    
+
     @staticmethod
     def smart_title_fallback(url: str, message_text: str) -> str:
         """Smart fallback chain for title extraction"""
@@ -546,8 +539,7 @@ class TitleCleaner:
             for word in words:
                 if (len(word) > 2 
                     and word.lower() not in noise_words
-                    and not re.match(r'^\d+
-                    , word)
+                    and not re.match(r'^\d+$', word)  # FIXED - Skip pure numbers
                     and word.isalpha()):
                     meaningful_words.append(word.title())
             
@@ -569,7 +561,6 @@ class TitleCleaner:
                 
         except Exception:
             return "Product"
-
 class PriceExtractor:
     """Extract and format prices"""
     
