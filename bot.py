@@ -439,15 +439,14 @@ class TitleCleaner:
             'set', 'combo', 'multipack', 'piece', 'pieces', 'pcs'
         }
         
-        # Skip gender and quantity words too
+      # Skip gender and quantity words too
         gender_words = {kw for kw_list in TitleCleaner.GENDER_KEYWORDS.values() for kw in kw_list}
         all_skip_words = skip_words.union(gender_words)
         
         for word in words:
             if (len(word) > 2 
                 and word.lower() not in all_skip_words
-                and not re.match(r'^\d+
-                    , word)
+                and not re.match(r'^\d+$', word)  # Skip pure numbers - FIXED LINE 449
                 and not word.lower().startswith('nm')  # Skip URL slugs like nm7xhr
                 and word.isalpha()):
                 product_words.append(word.title())
