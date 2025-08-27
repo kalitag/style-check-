@@ -419,7 +419,7 @@ class TitleCleaner:
             if word in TitleCleaner.CLOTHING_KEYWORDS:
                 return word.title()
         
-        # If not clothing, extract meaningful product words
+       # If not clothing, extract meaningful product words
         product_words = []
         skip_words = {
             'for', 'with', 'and', 'or', 'the', 'a', 'an', 'in', 'on', 'at',
@@ -431,12 +431,12 @@ class TitleCleaner:
         gender_words = {kw for kw_list in TitleCleaner.GENDER_KEYWORDS.values() for kw in kw_list}
         all_skip_words = skip_words.union(gender_words)
         
-      for word in words:
-        if (len(word) > 2
-        and word not in all_skip_words
-        and not re.match(r'^\d+', word)  # Skip pure numbers
-        and not word.startswith('http')):  # Skip URLs
-        product_words.append(word)
+        for word in words:
+            if (len(word) > 2
+                and word not in all_skip_words
+                and not re.match(r'^\d+', word)  # Skip pure numbers
+                and not word.startswith('http')):  # Skip URLs
+                product_words.append(word)
     
     @staticmethod
     def is_nonsense_title(title: str) -> bool:
@@ -724,7 +724,7 @@ if __name__ == "__main__":
                 and not word.startswith('http')):  # Skip URLs
                 product_words.append(word)
         
-        # Take meaningful words for product name
+         # Take meaningful words for product name
         if product_words:
             # Prioritize words that appear later (often product names)
             return ' '.join(product_words[-3:]) if len(product_words) >= 3 else ' '.join(product_words)
